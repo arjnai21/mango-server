@@ -16,15 +16,10 @@ def hello_world():
 
 @app.route('/ad-gen', methods=["POST"])
 def generate_ad_request():
-    print("got request")
-    params = request.args.get('param')
-    print("got param")
-    if request.headers.get("Content-Type") == "application/json":
-        print("request was in json")
-    print("about to call get_json")
-    content = request.get_json(force=True)
-    print(content["param"])
-    print("hellooo")
+    
+    if request.headers.get("Content-Type") != "application/json":
+        return "send me some json cuzzo"
+    content = request.get_json()
     return content
  
 # main driver function
