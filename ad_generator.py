@@ -5,7 +5,7 @@ f = open("content.json", "r")
 str = f.read()
 data = json.loads(str)
 
-openai.api_key = "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"
+openai.api_key = ""
 
 # characteristics = [ "Location", "Age", "Generation", "Gender", "Language", "Education level", "Field of study","School", "Ethnic affinity", "Income"]
 
