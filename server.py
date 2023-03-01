@@ -30,8 +30,14 @@ map = {
         "make" : "",
         "model": [],
         "id": 1,
-        "endpoint": ""
+        "endpoint": "",
+
+        "company_name": "",
+        "industry": "",
+        "logo": "",
+        "description": ""
        }
+#ad_type should be parameter
 
 # The route() function of the Flask class is a decorator,
 # which tells the application which URL should call
@@ -78,6 +84,18 @@ def generate_ad_request():
     
     if not ("endpoint" in content and type(content["endpoint"]) == str):
         return "Missing/Invalid endpoint"
+    
+    if not ("company_name" in content and type(content["company_name"]) == str):
+        return "Missing/Invalid company_name"
+    
+    if not("industry" in content and type(content["industry"]) == str):
+        return "Missing/Invalid industry"
+    
+    if not("logo" in content and type(content["logo"]) == str):
+        return "Missing/Invalid logo"
+    
+    if not("description" in content and type(content["description"]) == str):
+        return "Missing/Invalid description"
 
     f = open("content.json", "w")
     f.write(json.dumps(content))

@@ -1,9 +1,10 @@
 import json
 import openai
+from geopy.geocoders import Nominatim
 
 f = open("content.json", "r")
-str = f.read()
-data = json.loads(str)
+s = f.read()
+data = json.loads(s)
 
 openai.api_key = ""
 
@@ -16,15 +17,33 @@ operating_system = data["operating_system"]
 device_type = data["device_type"]
 make = data["make"]
 model = data["model"]
+company_name = data["company_name"]
+industry = data["industry"]
+description = data["description"]
 
-def generate_prompt(country, geographic_boundaries, carrier_list, operating_system, device_type, make, model):
-    prompt = "I am a marketer for Blendr. Blendr sells premium blenders. Write a high-quality, 200 word ad that would convince the individual to buy the blender."
+def pull_city(geographic_boundaries):
+    string = ""
+    geolocator = Nominatim(user_agent="App")
+    for i in geographic_boundaries:
+        Latitude = str(i["lat"])
+        Longitude = str(i["long"])
+
+        location = geolocator.reverse(Latitude+","+Longitude)
+        address = location.raw['address']
+
+        string +=  f"within {i['range']} meters of {address.get('county', '')}, {address.get('state', '')}; "
     
-    prompt += f'The individual is from  {country}. '
-    prompt += f'The individual may reside at these coordinates: {geographic_boundaries}. '
+    chomp = string[:-2]
+    return chomp
+
+def generate_prompt(country, geographic_boundaries, carrier_list, operating_system, device_type, make, model, company_name, industry, description):
+    prompt = f"I am a marketer for {company_name} in the {industry} industry. {description} Write a high-quality, 200 word ad for {company_name}. "
+    
+    prompt += f'The individual that will see this ad is from  {country}. '
+    prompt += f'The individual may reside at these places: {pull_city(geographic_boundaries)}. ' #Find tune this, kinda creepy
     prompt += f'This is the carrier list: {carrier_list}. '
     prompt += f'These are the possible operating systems: {operating_system}. '
-    prompt += f'These are the possible device types: {device_type}. '
+    prompt += f'These are the possible device types: {device_type}. ' #A little weird
     prompt += f'This is the individuals make: {make}, and the possible models are {model}.'
 
     print(prompt)
@@ -41,7 +60,7 @@ def main(name):
     # print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
     response = openai.Completion.create(
         model="text-davinci-003",
-        prompt=generate_prompt(country, geographic_boundaries, carrier_list, operating_system, device_type, make, model),
+        prompt=generate_prompt(country, geographic_boundaries, carrier_list, operating_system, device_type, make, model, company_name, industry, description),
         temperature=0.7,
         max_tokens=400
     )
